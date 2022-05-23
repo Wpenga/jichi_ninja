@@ -6,18 +6,19 @@ const { readFile } = require('fs/promises');
 const path = require('path');
 
 const qlDir = process.env.QL_DIR || '/ql';
-const authFile = path.join(qlDir, '/data/config/auth.json');
+const authFile = path.join(qlDir, '/config/auth.json');
 
 const api = got.extend({
-  prefixUrl: process.env.QL_URL || 'http://localhost:5600',
+//   prefixUrl: process.env.QL_URL || 'http://localhost:5700',
+  prefixUrl: 'http://localhost:5700',
   retry: { limit: 0 },
 });
-
+// 获取token
 async function getToken() {
   const authConfig = JSON.parse(await readFile(authFile));
   return authConfig.token;
 }
-
+// 获取ck
 module.exports.getEnvs = async () => {
   const token = await getToken();
   const body = await api({
@@ -33,12 +34,12 @@ module.exports.getEnvs = async () => {
   }).json();
   return body.data;
 };
-
+// 统计数量
 module.exports.getEnvsCount = async () => {
   const data = await this.getEnvs();
   return data.length;
 };
-
+// 增加
 module.exports.addEnv = async (cookie, remarks) => {
   const token = await getToken();
   const body = await api({
@@ -68,7 +69,7 @@ module.exports.updateEnv = async (cookie, eid, remarks) => {
     json: {
       name: 'JD_COOKIE',
       value: cookie,
-      _id: eid,
+      id: eid,
       remarks,
     },
     headers: {
@@ -148,7 +149,7 @@ module.exports.updateWSCKEnv = async (jdwsck, wseid, remarks) => {
     json: {
       name: 'JD_WSCK',
       value: jdwsck,
-      _id: wseid,
+      id: wseid,
       remarks,
     },
     headers: {
